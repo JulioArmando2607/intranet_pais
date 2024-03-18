@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 
-class FormatoMedicinaScreen extends StatefulWidget {
-  @override
-  _FormatoMedicinaScreenState createState() => _FormatoMedicinaScreenState();
-}
+class FormatoMedicinaScreen extends StatelessWidget {
+  final columns = [
+    'PERSONA',
+    'LUGAR',
+    'DX 01',
+    'DX 02',
+    'DX 03',
+    'DX 04',
+    'Ecografía',
+    'Teleconsulta por médico',
+    '...'
+  ];
 
-class _FormatoMedicinaScreenState extends State<FormatoMedicinaScreen> {
-  final ScrollController _fixedColumnController = ScrollController();
-  final ScrollController _scrollingBodyController = ScrollController();
-
-  @override
-  void dispose() {
-    _fixedColumnController.dispose();
-    _scrollingBodyController.dispose();
-    super.dispose();
-  }
+  // Esta lista debe ser poblada con tus datos
+  final data = [
+    ['ANGEL QUISPE YANARICO', 'Intramuro', 'J42', '', '', '', '0', '0', '...'],
+    // Más datos...
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -22,74 +25,26 @@ class _FormatoMedicinaScreenState extends State<FormatoMedicinaScreen> {
       appBar: AppBar(
         title: Text('MEDICINA'),
       ),
-      body: Row(
-        children: <Widget>[
-          // Columnas fijas
-          Container(
-            width: 200, // ajusta esto a la anchura de tus columnas fijas
-            child: _buildFixedColumn(),
-          ),
-          // Columnas desplazables
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              controller: _scrollingBodyController,
-              child: _buildScrollingBody(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFixedColumn() {
-    return SingleChildScrollView(
-      controller: _fixedColumnController,
-      child: DataTable(
-        columns: [
-          DataColumn(label: Text('ITEM')),
-          DataColumn(label: Text('TIPO DOCUMENTO')),
-          // Añade aquí las columnas adicionales que deberían estar fijas
-        ],
-        rows: List<DataRow>.generate(
-          20, // El número de filas que quieres en la tabla
-          (index) => DataRow(
-            cells: [
-              DataCell(Text('${index + 1}')),
-              DataCell(Text('DNI: 0123456789')),
-              // Añade aquí más celdas de datos que deberían estar fijas
-            ],
+      body: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: DataTable(
+            columns: getColumns(columns),
+            rows: getRows(data),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildScrollingBody() {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (ScrollNotification scrollInfo) {
-        _fixedColumnController.jumpTo(_scrollingBodyController.offset);
-        return true;
-      },
-      child: DataTable(
-        columns: [
-          DataColumn(label: Text('PERSONA')),
-          DataColumn(label: Text('LUGAR')),
-          DataColumn(label: Text('DX 01')),
-          // Añade aquí las columnas adicionales que deberían desplazarse
-        ],
-        rows: List<DataRow>.generate(
-          20, // El número de filas que quieres en la tabla
-          (index) => DataRow(
-            cells: [
-              DataCell(Text('Nombre ${index + 1}')),
-              DataCell(Text('Lugar')),
-              DataCell(Text('Info')),
-              // Añade aquí más celdas de datos que deberían desplazarse
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  List<DataColumn> getColumns(List<String> columns) =>
+      columns.map((String column) => DataColumn(label: Text(column))).toList();
+
+  List<DataRow> getRows(List<List<String>> data) =>
+      data.map((List<String> row) {
+        final cells = row.map((cell) => DataCell(Text(cell))).toList();
+
+        return DataRow(cells: cells);
+      }).toList();
 }
